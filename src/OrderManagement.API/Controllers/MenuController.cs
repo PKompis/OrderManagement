@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrderManagement.Application.Common.Security;
 using OrderManagement.Application.Menu.Commands.CreateMenuItem;
 using OrderManagement.Application.Menu.Commands.DeleteMenuItem;
 using OrderManagement.Application.Menu.Commands.UpdateMenuItem;
@@ -23,6 +25,7 @@ public sealed class MenuController(IMediator mediator, IMapper mapper) : Control
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IReadOnlyCollection<MenuItemResponse>>> GetMenu(CancellationToken cancellationToken)
     {
         var query = new GetMenuItemsQuery();
@@ -39,6 +42,7 @@ public sealed class MenuController(IMediator mediator, IMapper mapper) : Control
     /// </summary>
     /// <param name="request">The request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPost]
     public async Task<ActionResult<MenuItemResponse>> CreateMenuItem([FromBody] UpsertMenuItemRequest request, CancellationToken cancellationToken)
     {
@@ -58,6 +62,7 @@ public sealed class MenuController(IMediator mediator, IMapper mapper) : Control
     /// <param name="request">The request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = ApplicationRoles.Admin)]
     public async Task<ActionResult<MenuItemResponse>> UpdateMenuItem(Guid id, [FromBody] UpsertMenuItemRequest request, CancellationToken cancellationToken)
     {
         var command = mapper.Map<UpdateMenuItemCommand>(request) with { Id = id };
@@ -75,6 +80,7 @@ public sealed class MenuController(IMediator mediator, IMapper mapper) : Control
     /// <param name="id">The identifier.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = ApplicationRoles.Admin)]
     public async Task<IActionResult> DeleteMenuItem(Guid id, CancellationToken cancellationToken)
     {
         var command = new DeleteMenuItemCommand(id);

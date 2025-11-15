@@ -21,4 +21,10 @@ public interface IOrderReadRepository
     /// <param name="filter">The filter.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     Task<IReadOnlyList<Order>> GetByFilterAsync(OrderFilter filter, int? maxResults = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the statistics asynchronous.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task<OrderStatisticsModel> GetStatisticsAsync(CancellationToken cancellationToken = default);
 }

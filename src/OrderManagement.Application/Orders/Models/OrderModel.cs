@@ -44,6 +44,11 @@ public sealed record OrderModel
     public AssignmentInfoModel? Assignment { get; init; }
 
     /// <summary>
+    /// Gets the delivery time needed.
+    /// </summary>
+    public TimeSpan? DeliveryTimeNeeded { get; init; }
+
+    /// <summary>
     /// Gets the items.
     /// </summary>
     public IReadOnlyCollection<OrderItemModel> Items { get; init; } = [];
@@ -52,4 +57,9 @@ public sealed record OrderModel
     /// Gets the total.
     /// </summary>
     public decimal Total { get; init; }
+
+    /// <summary>
+    /// Gets the estimated delivery time.
+    /// </summary>
+    public DateTimeOffset? EstimatedDeliveryTime => DeliveryTimeNeeded is null ? null : CreatedAt + DeliveryTimeNeeded;
 }

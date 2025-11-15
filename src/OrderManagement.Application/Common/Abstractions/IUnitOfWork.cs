@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.Application.Abstractions;
+﻿namespace OrderManagement.Application.Common.Abstractions;
 
 /// <summary>
 /// Unit of work interface

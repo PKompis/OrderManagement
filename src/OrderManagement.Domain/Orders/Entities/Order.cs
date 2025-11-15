@@ -39,6 +39,11 @@ public sealed class Order
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
 
     /// <summary>
+    /// Gets the delivery time needed.
+    /// </summary>
+    public TimeSpan? DeliveryTimeNeeded { get; private set; }
+
+    /// <summary>
     /// Gets the delivery address. (only for Delivery)
     /// </summary>
     public DeliveryAddress? DeliveryAddress { get; private set; }
@@ -127,6 +132,27 @@ public sealed class Order
         if (Type != OrderType.Delivery) throw new ValidationException("Cannot assign a courier to a pickup order.", "Order.AssignCourierOnPickup");
         if (courierId == Guid.Empty) throw new ValidationException("CourierId is required.", "Order.CourierIdRequired");
 
+        if (Status is not (OrderStatus.Pending or OrderStatus.Preparing or OrderStatus.ReadyForDelivery)) throw new ValidationException("Order is not in an assignable state.", "Order.Status");
+
         Assignment = AssignmentInfo.Create(courierId, now);
+    }
+
+    /// <summary>
+    /// Sets the delivery time needed.
+    /// </summary>
+    /// <param name="duration">The duration.</param>
+    /// <returns></returns>
+    /// <exception cref="ValidationException">
+    /// Delivery time is only valid for delivery orders., Order.DeliveryTimeOnPickup
+    /// or
+    /// Delivery duration must be positive., Order.DeliveryTimeInvalid
+    /// </exception>
+    public void SetDeliveryTimeNeeded(TimeSpan duration)
+    {
+        if (Type != OrderType.Delivery) throw new ValidationException("Delivery time is only valid for delivery orders.", "Order.DeliveryTimeOnPickup");
+
+        if (duration <= TimeSpan.Zero) throw new ValidationException("Delivery duration must be positive.", "Order.DeliveryTimeInvalid");
+
+        DeliveryTimeNeeded = duration;
     }
 }

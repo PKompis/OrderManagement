@@ -33,6 +33,11 @@ public sealed record OrderResponse
     public DateTimeOffset CreatedAt { get; init; }
 
     /// <summary>
+    /// Gets the delivery time needed.
+    /// </summary>
+    public TimeSpan? DeliveryTimeNeeded { get; init; }
+
+    /// <summary>
     /// Gets the delivery address.
     /// </summary>
     public DeliveryAddressResponse? DeliveryAddress { get; init; }
@@ -51,4 +56,9 @@ public sealed record OrderResponse
     /// Gets the total.
     /// </summary>
     public decimal Total { get; init; }
+
+    /// <summary>
+    /// Gets the estimated delivery time.
+    /// </summary>
+    public DateTimeOffset? EstimatedDeliveryTime { get; init; }
 }

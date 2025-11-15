@@ -28,7 +28,6 @@ public sealed class PlaceOrderCommandValidator : AbstractValidator<PlaceOrderCom
                 RuleFor(x => x.DeliveryAddress!.Street).NotEmpty().MaximumLength(200);
                 RuleFor(x => x.DeliveryAddress!.City).NotEmpty().MaximumLength(100);
                 RuleFor(x => x.DeliveryAddress!.Zip).NotEmpty().MaximumLength(20);
-                RuleFor(x => x.DeliveryAddress!.Country).NotEmpty().MaximumLength(100);
             });
         });
     }

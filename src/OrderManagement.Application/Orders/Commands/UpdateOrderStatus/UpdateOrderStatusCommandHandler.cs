@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using OrderManagement.Application.Abstractions;
+using OrderManagement.Application.Common.Abstractions;
 using OrderManagement.Application.Exceptions;
 using OrderManagement.Application.Orders.Abstractions;
 using OrderManagement.Application.Orders.Models;

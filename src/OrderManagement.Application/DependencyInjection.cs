@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using OrderManagement.Application.Admin.Mappings;
 using OrderManagement.Application.Menu.Mappings;
 using OrderManagement.Application.Orders.Mappings;
 using OrderManagement.Application.Pipelines;
@@ -17,12 +18,14 @@ public static class DependencyInjection
     /// </summary>
     /// <param name="services">The services.</param>
     public static IServiceCollection AddApplication(this IServiceCollection services) =>
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly))
+        services
+            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly))
             .AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly)
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
             .AddAutoMapper(cfg =>
             {
                 cfg.AddProfile<MenuApplicationProfile>();
                 cfg.AddProfile<OrdersApplicationProfile>();
+                cfg.AddProfile<AdminApplicationProfile>();
             });
 }

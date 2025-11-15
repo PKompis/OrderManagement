@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using OrderManagement.Application.Abstractions;
+using OrderManagement.Application.Common.Abstractions;
 using OrderManagement.Application.Customers.Abstractions;
 using OrderManagement.Application.Exceptions;
 using OrderManagement.Application.Menu.Abstractions;
@@ -18,18 +18,20 @@ public sealed class PlaceOrderCommandHandler(
     IMenuItemReadRepository menuItemReadRepository,
     ICustomerReadRepository customerReadRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper
+    IMapper mapper,
+    IDeliveryEtaService deliveryEtaService
 ) : IRequestHandler<PlaceOrderCommand, OrderResult>
 {
     public async Task<OrderResult> Handle(PlaceOrderCommand request, CancellationToken cancellationToken)
     {
         var customerExists = await customerReadRepository.ExistsAsync(request.CustomerId, cancellationToken);
-
         if (!customerExists) throw new NotFoundException("Customer", request.CustomerId);
 
         var orderItems = await RetrieveOrderItems(request, cancellationToken);
 
-        var deliveryAddress = request.Type == OrderType.Delivery ? RetrieveDeliveryAddress(request) : default;
+        var isDelivery = request.Type == OrderType.Delivery;
+
+        var deliveryAddress = isDelivery ? RetrieveDeliveryAddress(request) : default;
 
         var order = Order.Create(
             customerId: request.CustomerId,
@@ -38,13 +40,29 @@ public sealed class PlaceOrderCommandHandler(
             deliveryAddress: deliveryAddress
         );
 
-        await orderRepository.AddAsync(order, cancellationToken);
+        await SetEstimatedTravelTime(order, isDelivery, deliveryAddress, cancellationToken);
 
+        await orderRepository.AddAsync(order, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         var model = mapper.Map<OrderModel>(order);
 
         return new OrderResult { Order = model };
+    }
+
+    private async Task SetEstimatedTravelTime(Order order, bool isDelivery, DeliveryAddress? deliveryAddress, CancellationToken cancellationToken)
+    {
+        if (!isDelivery || deliveryAddress is null) return;
+
+        var estimate = await deliveryEtaService.GetEstimateAsync(
+            deliveryAddress,
+            cancellationToken
+        );
+
+        if (estimate?.EstimatedTravelTime is not null)
+        {
+            order.SetDeliveryTimeNeeded(estimate.EstimatedTravelTime);
+        }
     }
 
     private async Task<List<OrderItem>> RetrieveOrderItems(PlaceOrderCommand request, CancellationToken cancellationToken)

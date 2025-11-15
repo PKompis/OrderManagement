@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrderManagement.Application.Common.Security;
 using OrderManagement.Application.Orders.Commands.AssignOrder;
 using OrderManagement.Application.Orders.Commands.PlaceOrder;
 using OrderManagement.Application.Orders.Commands.UpdateOrderStatus;
@@ -28,6 +30,7 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="request">The request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpPost]
+    [Authorize(Roles = ApplicationRoles.Customer)]
     public async Task<ActionResult<OrderResponse>> PlaceOrder([FromBody] PlaceOrderRequest request, CancellationToken cancellationToken)
     {
         var command = mapper.Map<PlaceOrderCommand>(request);
@@ -45,6 +48,7 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="id">The identifier.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpGet("{id:guid}")]
+    [Authorize]
     public async Task<ActionResult<OrderResponse>> GetOrderById(Guid id, CancellationToken cancellationToken)
     {
         var query = new GetOrderByIdQuery(id);
@@ -65,6 +69,7 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="customerId">The customer identifier.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IReadOnlyCollection<OrderResponse>>> GetOrders(
         [FromQuery] OrderStatusDto? status,
         [FromQuery] OrderTypeDto? type,
@@ -95,6 +100,7 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="status">The status.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpPatch("{id:guid}/status")]
+    [Authorize(Roles = $"{ApplicationRoles.Admin},{ApplicationRoles.Kitchen}, {ApplicationRoles.Delivery}")]
     public async Task<ActionResult<OrderResponse>> UpdateStatus(Guid id, [FromQuery] OrderStatusDto status, CancellationToken cancellationToken)
     {
         var command = new UpdateOrderStatusCommand(id, (OrderStatus)status);
@@ -113,6 +119,7 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="request">The request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpPost("{id:guid}/assignments")]
+    [Authorize(Roles = $"{ApplicationRoles.Admin},{ApplicationRoles.Kitchen}")]
     public async Task<ActionResult<OrderResponse>> AssignOrder(Guid id, [FromBody] AssignOrderRequest request, CancellationToken cancellationToken)
     {
         // In a real app, courierId would come from User.Identity
@@ -131,6 +138,7 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="courierId">The courier identifier.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpGet("assignments")]
+    [Authorize(Roles = ApplicationRoles.Delivery)]
     public async Task<ActionResult<IReadOnlyCollection<OrderResponse>>> GetAssignments([FromQuery] Guid courierId, CancellationToken cancellationToken)
     {
         // In a real app, courierId would come from User.Identity

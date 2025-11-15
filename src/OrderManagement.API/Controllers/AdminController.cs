@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Application.Admin.Queries;
+using OrderManagement.Application.Common.Security;
 using OrderManagement.Contracts.Admin.Responses;
 
 namespace OrderManagement.API.Controllers;
@@ -12,6 +14,7 @@ namespace OrderManagement.API.Controllers;
 /// <seealso cref="ControllerBase" />
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize(Roles = ApplicationRoles.Admin)]
 public sealed class AdminController(IMediator mediator, IMapper mapper) : ControllerBase
 {
     /// <summary>
