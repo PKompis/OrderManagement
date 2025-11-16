@@ -37,15 +37,20 @@ public sealed class AutoAssignOrdersCommandHandler(
     {
         var couriers = await staffReadRepository.GetAvailableCouriersAsync(cancellationToken);
 
-        var availableCouriers = couriers?.Where(c => c.IsActive && c.Role == StaffRole.Delivery).ToList();
+        var availableCouriers = couriers?.Where(c => c.IsActive && c.Role == StaffRole.Delivery).OrderBy(c => c.Name).ToList();
         if (availableCouriers is null || availableCouriers.Count == 0) throw new BadRequestException("No available delivery couriers to assign orders to.");
 
         var candidateOrders = await RetriveCandidateOrders(request, cancellationToken);
         if (candidateOrders is null || candidateOrders.Count == 0) return new OrdersResult { Orders = [] };
 
+        int courierIndex = 0;
+
         foreach (var order in candidateOrders)
         {
-            var courier = availableCouriers[Random.Shared.Next(availableCouriers.Count)];
+            if (order.Assignment is not null) continue;
+
+            var courier = availableCouriers[courierIndex];
+            courierIndex = (courierIndex + 1) % availableCouriers.Count;
 
             order.AssignCourier(courier.Id, DateTimeOffset.UtcNow);
 

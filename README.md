@@ -29,7 +29,7 @@ A .NET 8 minimal API for Order Management System (OMS) for a takeaway restaurant
     - Manage menu items (add, update, delete menu items).
     - View some useful statistics (e.g. average order fulfillment time etc.)
 
-5. Dummy Authentication with stateless JWTs (no refresh/logout for simplicity) and role-based access control (e.g., customer, staff, delivery personnel, admin).
+5. Dummy Authentication with stateless JWTs (no refresh/logout for simplicity - only userid as "login") and role-based access control (e.g., customer, staff, delivery personnel, admin).
 
 6. Integration with a mapping API (OpenRouteService) to calculate estimated delivery times.
 
@@ -103,5 +103,5 @@ EXEC sp_addrolemember N'db_ddladmin',   N'ordermanagement_app';
 - It's not an application I would expect lots of exceptions. In case of many exceptions and many RPS Result pattern should be consired. Result pattern leads to long lines of code and I avoid it if not nessasary.
 - Refit is a library that could be considered to be used but in the architecture of the project the interface is a port in Application. Application should not know url/header related info.
 - The exception model intentionally remains simple. In real-world systems, we might introduce structured error taxonomies, centralized registries, or Roslyn source generators to eliminate reflection and precompute metadata for higher performance.
-- JWT tokens should not be stateless and logout/refresh functionalityies should be added.
+- JWT tokens should not be stateless and logout/refresh functionalityies should be added. Login should not have only userid as "login".
 - Delivery time should be calculated with including the time for preparation somehow. For simplicity it was skipped.
