@@ -10,8 +10,8 @@ namespace OrderManagement.Application.Menu.Commands.DeleteMenuItem;
 /// <summary>
 /// Delete Menu Item Command Handler
 /// </summary>
-/// <seealso cref="IRequestHandler{DeleteMenuItemCommand, Unit}" />
-public sealed class DeleteMenuItemCommandHandler(IMenuItemRepository repository, IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequest<DeleteMenuItemCommand>
+/// <seealso cref="IRequestHandler{DeleteMenuItemCommand}" />
+public sealed class DeleteMenuItemCommandHandler(IMenuItemRepository repository, IUnitOfWork unitOfWork, ICurrentUser currentUser) : IRequestHandler<DeleteMenuItemCommand>
 {
     /// <summary>
     /// Handles the specified request.

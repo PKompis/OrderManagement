@@ -7,10 +7,4 @@ namespace OrderManagement.Application.Exceptions;
 /// Validation Exception
 /// </summary>
 /// <seealso cref="BaseException" />
-public sealed class ValidationFailedException(IEnumerable<string> errors) : BaseException("Validation failed.", HttpStatusCode.BadRequest, "validation_failed")
-{
-    /// <summary>
-    /// Gets the errors.
-    /// </summary>
-    public IReadOnlyList<string> Errors { get; } = errors.ToList().AsReadOnly();
-}
+public sealed class ValidationFailedException(IEnumerable<string> errors) : BaseException($"Validation failed: {string.Join(',', errors)}", HttpStatusCode.BadRequest, "validation_failed") { }

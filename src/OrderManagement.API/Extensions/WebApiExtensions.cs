@@ -1,4 +1,6 @@
-﻿using OrderManagement.Contracts.Common.Errors;
+﻿using Microsoft.OpenApi.Models;
+using OrderManagement.API.Filters;
+using OrderManagement.Contracts.Common.Errors;
 using System.Threading.RateLimiting;
 
 namespace OrderManagement.API.Extensions;
@@ -33,5 +35,28 @@ internal static class WebApiExtensions
                 };
                 await context.HttpContext.Response.WriteAsJsonAsync(payload, cancellationToken: token);
             };
+        });
+
+    internal static IServiceCollection AddSwagger(this IServiceCollection services) =>
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Order Management API",
+                Version = "v1",
+                Description = "A .NET 8 minimal API for Order Management System (OMS) for a takeaway restaurant that supports the complete lifecycle of an order, including preparation and delivery."
+            });
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+            });
+
+            c.OperationFilter<AuthOperationFilter>();
         });
 }

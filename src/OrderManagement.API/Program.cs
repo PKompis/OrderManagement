@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OrderManagement.API.Extensions;
 using OrderManagement.API.Mappings;
@@ -7,6 +8,7 @@ using OrderManagement.API.Security;
 using OrderManagement.Application;
 using OrderManagement.Application.Common.Abstractions;
 using OrderManagement.Infrastructure;
+using OrderManagement.Infrastructure.Persistence;
 using Serilog;
 using System.Text;
 
@@ -26,7 +28,7 @@ var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
 builder.Services
     .AddControllers().Services
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen()
+    .AddSwagger()
     .AddAutoMapper(cfg =>
     {
         cfg.AddProfile<OrdersApiProfile>();
@@ -68,11 +70,11 @@ builder.Services
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//    await db.Database.MigrateAsync();
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.UseExceptionHandling();
 

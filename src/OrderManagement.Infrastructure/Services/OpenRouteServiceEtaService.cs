@@ -21,7 +21,7 @@ public sealed class OpenRouteServiceEtaService(HttpClient httpClient, IOptions<O
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
     private const string _geocodePath = "geocode/search";
-    private string DirectionsPath => $"v2/directions/{options.Profile}";
+    private string DirectionsPath => $"v2/directions/{options.Profile}/geojson?api_key={options.ApiKey}";
 
     /// <summary>
     /// Calculates the estimated travel time for a delivery order based on its address.

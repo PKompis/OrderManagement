@@ -37,7 +37,11 @@ A .NET 8 minimal API for Order Management System (OMS) for a takeaway restaurant
 
 8. Rate limiter
 
+9. Dummy logging + exception handling
+
 ## Architecture
+
+![Screenshot](./arch.drawio.png)
 
 | Concern | Tech |
 |---|---|
@@ -58,13 +62,54 @@ src/
   OrderManagement.Application/        # Commands/Queries (MediatR), validators, ports
   OrderManagement.Contracts/          # DTOs (Requests, Responses), Error format
   OrderManagement.Domain/             # Entities, Domain Exceptions, Rules
-  OrderManagement.Infrastructure/     # EF Core, Repositories
+  OrderManagement.Infrastructure/     # EF Core, Repositories, Jobs, External HTTP Calls
 tests/
-  OrderManagement.UnitTests/          # xUnit: domain rules, handlers
+  OrderManagement.UnitTests/          # xUnit: domain rules, handlers, validators
   OrderManagement.IntegrationTests/   # Integration Tests
 ```
 
+## Sequence diagram of the order 
+
+![Screenshot](./order_lifecycle.png)
+
+## Seed Data
+
+The database is initialized with some demo data via the initial EF Core migration.
+You can use these IDs directly when testing the API or obtaining JWT tokens.
+
+### Customers
+
+| ID                                   | Name           | Phone              | Email               |
+|--------------------------------------|----------------|--------------------|---------------------|
+| `11111111-1111-1111-1111-111111111111` | Alice Johnson  | `+30 690 000 0001` | `alice@example.com`  |
+| `22222222-2222-2222-2222-222222222222` | Bob Smith      | `+30 690 000 0002` | `bob@example.com`    |
+| `33333333-3333-3333-3333-333333333333` | Charlie Brown  | `+30 690 000 0003` | `charlie@example.com`|
+
+### Staff
+
+| ID                                   | Name            | Role      | IsActive |
+|--------------------------------------|-----------------|-----------|----------|
+| `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa` | Admin User      | Admin     | true     |
+| `bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb` | Kitchen Staff 1 | Kitchen   | true     |
+| `cccccccc-cccc-cccc-cccc-cccccccccccc` | Kitchen Staff 2 | Kitchen   | true     |
+| `dddddddd-dddd-dddd-dddd-dddddddddddd` | Courier 1       | Delivery  | true     |
+| `eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee` | Courier 2       | Delivery  | true     |
+
+\* These IDs are used as userId in the simplified /api/v1/auth/login endpoint (combined with the isStaff flag) to issue JWT tokens for different roles.
+
+### Menu Items
+
+| ID                                   | Name             | Category | Price | Available |
+|--------------------------------------|------------------|----------|-------|-----------|
+| `10000000-0000-0000-0000-000000000001` | Margherita Pizza | Pizza    | 8.50  | true      |
+| `10000000-0000-0000-0000-000000000002` | Pepperoni Pizza  | Pizza    | 9.50  | true      |
+| `10000000-0000-0000-0000-000000000003` | Caesar Salad     | Salad    | 7.00  | true      |
+| `10000000-0000-0000-0000-000000000004` | Chicken Burger   | Burger   | 8.90  | true      |
+| `10000000-0000-0000-0000-000000000005` | French Fries     | Sides    | 3.50  | true      |
+
 ## Running the Service
+
+**Try New York addresses like "123 East 45th Street, New York, NY 10017"**
 
 ### Local (HTTP) — easiest setup
 Select the **OrderManagement.API (HTTP)** debug profile.
@@ -84,7 +129,9 @@ Steps
 3) Execute script:
 ```sql
 CREATE DATABASE OrderManagement;
+GO
 USE OrderManagement;
+GO
 CREATE LOGIN ordermanagement_app WITH PASSWORD = 'StrongPassword123!';
 CREATE USER  ordermanagement_app FOR LOGIN ordermanagement_app;
 EXEC sp_addrolemember N'db_datareader', N'ordermanagement_app';
@@ -105,3 +152,4 @@ EXEC sp_addrolemember N'db_ddladmin',   N'ordermanagement_app';
 - The exception model intentionally remains simple. In real-world systems, we might introduce structured error taxonomies, centralized registries, or Roslyn source generators to eliminate reflection and precompute metadata for higher performance.
 - JWT tokens should not be stateless and logout/refresh functionalityies should be added. Login should not have only userid as "login".
 - Delivery time should be calculated with including the time for preparation somehow. For simplicity it was skipped.
+- - More thorough Unit Tests and Integration Tests!

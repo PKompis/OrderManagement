@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderManagement.Application.Orders.Abstractions;
 using OrderManagement.Domain.Orders.Entities;
+using OrderManagement.Domain.Orders.Enums;
 
 namespace OrderManagement.Infrastructure.Persistence.Orders;
 
@@ -20,6 +21,28 @@ public sealed class OrderRepository(AppDbContext dbContext) : IOrderRepository
         if (id == Guid.Empty) return default;
 
         return await dbContext.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets delivery orders that are pending assignment:
+    /// - Delivery type
+    /// - No courier assigned
+    /// - Status = Pending or ReadyForDelivery
+    /// </summary>
+    /// <param name="maxResults"></param>
+    /// <param name="cancellationToken"></param>
+    public async Task<List<Order>> GetPendingAssignmentOrdersAsync(int? maxResults = null, CancellationToken cancellationToken = default)
+    {
+        IQueryable<Order> query = dbContext.Orders
+            .Where(o =>
+                o.Type == OrderType.Delivery &&
+                o.Assignment == null &&
+                (o.Status == OrderStatus.Pending || o.Status == OrderStatus.ReadyForDelivery))
+            .OrderBy(o => o.CreatedAt);
+
+        if (maxResults.HasValue) query = query.Take(maxResults.Value);
+
+        return await query.ToListAsync(cancellationToken);
     }
 
     /// <summary>

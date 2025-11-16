@@ -60,11 +60,21 @@ public sealed class OrderReadRepository(AppDbContext dbContext) : IOrderReadRepo
         var totalPickupOrders = await orders.Where(o => o.Type == OrderType.Pickup).CountAsync(cancellationToken);
         var totalDeliveryOrders = await orders.Where(o => o.Type == OrderType.Delivery).CountAsync(cancellationToken);
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var now = DateTimeOffset.UtcNow;
+        var todayStart = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero);
+        var tomorrowStart = todayStart.AddDays(1);
 
-        var deliveredToday = await orders.Where(o => o.Status == OrderStatus.Delivered && DateOnly.FromDateTime(o.CreatedAt.UtcDateTime) == today).CountAsync(cancellationToken);
+        var deliveredToday = await orders
+            .Where(o =>
+                o.Status == OrderStatus.Delivered &&
+                o.CreatedAt >= todayStart &&
+                o.CreatedAt < tomorrowStart)
+            .CountAsync(cancellationToken);
 
-        var totalRevenue = await orders.Where(o => o.Status == OrderStatus.Delivered).SumAsync(o => o.Total, cancellationToken);
+        var totalRevenue = await orders
+            .Where(o => o.Status == OrderStatus.Delivered)
+            .SelectMany(o => o.Items)
+            .SumAsync(i => i.UnitPrice * i.Quantity, cancellationToken);
 
         return new OrderStatisticsModel
         {

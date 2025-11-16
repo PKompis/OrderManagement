@@ -6,8 +6,6 @@ using OrderManagement.Application.Orders.Abstractions;
 using OrderManagement.Application.Orders.Models;
 using OrderManagement.Application.Orders.Results;
 using OrderManagement.Application.Staff.Abstractions;
-using OrderManagement.Domain.Orders.Entities;
-using OrderManagement.Domain.Orders.Enums;
 using OrderManagement.Domain.Staff.Enums;
 
 namespace OrderManagement.Application.Orders.Commands.AutoAssignOrders;
@@ -17,7 +15,6 @@ namespace OrderManagement.Application.Orders.Commands.AutoAssignOrders;
 /// </summary>
 /// <seealso cref="IRequestHandler{AutoAssignOrdersCommand, OrdersResult}" />
 public sealed class AutoAssignOrdersCommandHandler(
-    IOrderReadRepository orderReadRepository,
     IOrderRepository orderRepository,
     IStaffReadRepository staffReadRepository,
     IUnitOfWork unitOfWork,
@@ -40,7 +37,7 @@ public sealed class AutoAssignOrdersCommandHandler(
         var availableCouriers = couriers?.Where(c => c.IsActive && c.Role == StaffRole.Delivery).OrderBy(c => c.Name).ToList();
         if (availableCouriers is null || availableCouriers.Count == 0) throw new BadRequestException("No available delivery couriers to assign orders to.");
 
-        var candidateOrders = await RetriveCandidateOrders(request, cancellationToken);
+        var candidateOrders = await orderRepository.GetPendingAssignmentOrdersAsync(request.MaxOrders, cancellationToken);
         if (candidateOrders is null || candidateOrders.Count == 0) return new OrdersResult { Orders = [] };
 
         int courierIndex = 0;
@@ -61,20 +58,5 @@ public sealed class AutoAssignOrdersCommandHandler(
 
         var models = mapper.Map<IReadOnlyCollection<OrderModel>>(candidateOrders);
         return new OrdersResult { Orders = models };
-    }
-
-    private async Task<List<Order>?> RetriveCandidateOrders(AutoAssignOrdersCommand request, CancellationToken cancellationToken)
-    {
-        var filter = new OrderFilter { Type = OrderType.Delivery };
-        var allDeliveryOrders = await orderReadRepository.GetByFilterAsync(filter, request.MaxOrders, cancellationToken);
-
-        var candidateOrders = allDeliveryOrders
-            ?.Where(o =>
-                o.Assignment is null &&
-                (o.Status == OrderStatus.Pending || o.Status == OrderStatus.ReadyForDelivery))
-            .OrderBy(o => o.CreatedAt)
-            .ToList();
-
-        return candidateOrders;
     }
 }

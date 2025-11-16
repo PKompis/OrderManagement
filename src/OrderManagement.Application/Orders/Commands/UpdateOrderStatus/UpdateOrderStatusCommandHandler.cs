@@ -63,6 +63,6 @@ public sealed class UpdateOrderStatusCommandHandler(IOrderRepository repository,
     {
         if (order.Type != OrderType.Delivery) throw new ForbiddenException("Delivery staff can only update delivery orders.");
         if (order?.Assignment?.CourierId != courierId) throw new ForbiddenException("You can only update the status of orders assigned to you.");
-        if (targetStatus is not (OrderStatus.Delivered or OrderStatus.UnableToDeliver)) throw new ForbiddenException("Delivery staff can only mark orders as Delivered or UnableToDeliver.");
+        if (targetStatus is not (OrderStatus.Delivered or OrderStatus.UnableToDeliver or OrderStatus.OutForDelivery)) throw new ForbiddenException("Delivery staff can only mark orders as Delivered or UnableToDeliver or OutForDelivery.");
     }
 }

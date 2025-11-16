@@ -15,6 +15,14 @@ public interface IOrderRepository
     Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets delivery orders that are pending assignment:
+    /// - Delivery type
+    /// - No courier assigned
+    /// - Status = Pending or ReadyForDelivery
+    /// </summary>
+    Task<List<Order>> GetPendingAssignmentOrdersAsync(int? maxResults = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Adds to the order asynchronous.
     /// </summary>
     /// <param name="order">The order.</param>

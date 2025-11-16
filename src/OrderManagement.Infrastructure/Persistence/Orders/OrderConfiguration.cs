@@ -49,11 +49,11 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             assignment.Property(a => a.OutForDeliveryAt).HasColumnName("AssignmentOutForDeliveryAt");
             assignment.Property(a => a.DeliveredAt).HasColumnName("AssignmentDeliveredAt");
             assignment.Property(a => a.UnableToDeliverAt).HasColumnName("AssignmentUnableToDeliverAt");
-        });
 
-        // FK: Orders → Staff (AssignmentCourierId)
-        // nav-less relationship using the owned column as FK
-        builder.HasOne<Domain.Staff.Entities.Staff>().WithMany().HasForeignKey("AssignmentCourierId").OnDelete(DeleteBehavior.Restrict);
+            // FK: Assignment.CourierId → Staff.Id
+            assignment.HasOne<Domain.Staff.Entities.Staff>().WithMany().HasForeignKey(a => a.CourierId).OnDelete(DeleteBehavior.Restrict);
+            assignment.HasIndex(a => a.CourierId);
+        });
 
         // Owned collection: OrderItems
         builder.OwnsMany(o => o.Items, items =>
@@ -77,8 +77,5 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasIndex(o => o.Status);
         builder.HasIndex(o => o.Type);
         builder.HasIndex(o => o.CreatedAt);
-
-        // Index on assignment courier (FK column from owned type)
-        builder.HasIndex("AssignmentCourierId");
     }
 }
