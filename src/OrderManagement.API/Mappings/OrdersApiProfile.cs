@@ -31,20 +31,12 @@ public sealed class OrdersApiProfile : Profile
 
         //Request DTO -> Application Commands / Models
         CreateMap<PlaceOrderRequest, PlaceOrderCommand>();
-        //.ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
-        //.ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
-        //.ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
         CreateMap<DeliveryAddressRequest, DeliveryAddressModel>();
         CreateMap<PlaceOrderItemRequest, PlaceOrderItemModel>();
         CreateMap<AssignOrderRequest, AssignOrderCommand>();
 
         //Application Models / Results -> Response DTO
         CreateMap<OrderModel, OrderResponse>();
-        //.ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
-        //.ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-        //.ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
-        //.ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
-        //.ForMember(dest => dest.Assignment, opt => opt.MapFrom(src => src.Assignment));
         CreateMap<OrderItemModel, OrderItemResponse>();
         CreateMap<DeliveryAddressModel, DeliveryAddressResponse>();
         CreateMap<AssignmentInfoModel, AssignmentInfoResponse>();

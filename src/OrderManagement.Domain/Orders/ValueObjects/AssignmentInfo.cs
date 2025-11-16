@@ -65,6 +65,11 @@ public sealed record AssignmentInfo
         UnableToDeliverAt = unableToDeliverAt;
     }
 
+    /// <summary>
+    /// Creates the specified courier identifier.
+    /// </summary>
+    /// <param name="courierId">The courier identifier.</param>
+    /// <param name="now">The now.</param>
     public static AssignmentInfo Create(Guid courierId, DateTimeOffset now) => new(courierId, now, null, null, null);
 
     /// <summary>

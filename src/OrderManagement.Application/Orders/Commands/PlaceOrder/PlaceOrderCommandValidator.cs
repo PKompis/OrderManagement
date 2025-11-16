@@ -15,7 +15,6 @@ public sealed class PlaceOrderCommandValidator : AbstractValidator<PlaceOrderCom
     /// </summary>
     public PlaceOrderCommandValidator()
     {
-        RuleFor(x => x.CustomerId).NotEmpty();
         RuleFor(x => x.Type).IsInEnum();
         RuleFor(x => x.Items).NotNull().NotEmpty().WithMessage("At least one item is required.");
         RuleForEach(x => x.Items).SetValidator(new PlaceOrderItemModelValidator());

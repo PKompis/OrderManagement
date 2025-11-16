@@ -8,11 +8,6 @@ namespace OrderManagement.Contracts.Orders.Requests;
 public sealed record PlaceOrderRequest
 {
     /// <summary>
-    /// Gets the customer identifier.
-    /// </summary>
-    public Guid CustomerId { get; init; } // From auth later
-
-    /// <summary>
     /// Gets the type.
     /// </summary>
     public OrderTypeDto Type { get; init; }

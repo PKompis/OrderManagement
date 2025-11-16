@@ -63,7 +63,8 @@ builder.Services
     .AddAuthorization()
     .AddHttpContextAccessor()
     .AddScoped<ICurrentUser, CurrentUser>()
-    .AddScoped<ITokenService, JwtTokenService>();
+    .AddScoped<ITokenService, JwtTokenService>()
+    .AddGlobalRateLimiter();
 
 var app = builder.Build();
 

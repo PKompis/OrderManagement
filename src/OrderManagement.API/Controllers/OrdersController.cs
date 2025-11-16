@@ -122,7 +122,6 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     [Authorize(Roles = $"{ApplicationRoles.Admin},{ApplicationRoles.Kitchen}")]
     public async Task<ActionResult<OrderResponse>> AssignOrder(Guid id, [FromBody] AssignOrderRequest request, CancellationToken cancellationToken)
     {
-        // In a real app, courierId would come from User.Identity
         var command = new AssignOrderCommand(id, request.CourierId);
 
         var result = await mediator.Send(command, cancellationToken);
@@ -139,10 +138,9 @@ public sealed class OrdersController(IMediator mediator, IMapper mapper) : Contr
     /// <param name="cancellationToken">The cancellation token.</param>
     [HttpGet("assignments")]
     [Authorize(Roles = ApplicationRoles.Delivery)]
-    public async Task<ActionResult<IReadOnlyCollection<OrderResponse>>> GetAssignments([FromQuery] Guid courierId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyCollection<OrderResponse>>> GetAssignments(CancellationToken cancellationToken)
     {
-        // In a real app, courierId would come from User.Identity
-        var query = new GetDeliveryAssignmentsQuery(courierId);
+        var query = new GetDeliveryAssignmentsQuery();
 
         var result = await mediator.Send(query, cancellationToken);
 

@@ -7,4 +7,4 @@ namespace OrderManagement.Application.Orders.Queries.GetDeliveryAssignments;
 /// Get Delivery Assignments Query
 /// </summary>
 /// <seealso cref="IRequest{GetDeliveryAssignmentsResult}" />
-public sealed record GetDeliveryAssignmentsQuery(Guid CourierId) : IRequest<OrdersResult>;
+public sealed record GetDeliveryAssignmentsQuery() : IRequest<OrdersResult>;
