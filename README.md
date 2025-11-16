@@ -65,7 +65,6 @@ src/
   OrderManagement.Infrastructure/     # EF Core, Repositories, Jobs, External HTTP Calls
 tests/
   OrderManagement.UnitTests/          # xUnit: domain rules, handlers, validators
-  OrderManagement.IntegrationTests/   # Integration Tests
 ```
 
 ## Sequence diagram of the order 
@@ -150,6 +149,7 @@ EXEC sp_addrolemember N'db_ddladmin',   N'ordermanagement_app';
 - It's not an application I would expect lots of exceptions. In case of many exceptions and many RPS Result pattern should be consired. Result pattern leads to long lines of code and I avoid it if not nessasary.
 - Refit is a library that could be considered to be used but in the architecture of the project the interface is a port in Application. Application should not know url/header related info.
 - The exception model intentionally remains simple. In real-world systems, we might introduce structured error taxonomies, centralized registries, or Roslyn source generators to eliminate reflection and precompute metadata for higher performance.
-- JWT tokens should not be stateless and logout/refresh functionalityies should be added. Login should not have only userid as "login".
-- Delivery time should be calculated with including the time for preparation somehow. For simplicity it was skipped.
-- - More thorough Unit Tests and Integration Tests!
+- JWT tokens should not be stateless and logout/refresh functionalities should be added. Login should not have only userid as "login".
+- Delivery time should be calculated by including the time for preparation somehow. For simplicity it was skipped.
+- More thorough and sophisticated Unit Tests.
+- Add Integration Tests.
