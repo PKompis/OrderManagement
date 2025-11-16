@@ -146,10 +146,10 @@ EXEC sp_addrolemember N'db_ddladmin',   N'ordermanagement_app';
 - If menu/orders grows large, we could add paging parameters. For simplicity it was skipped.
 - Customers/Staff management was skipped for simplicity and initialized only with Migrations / Mock data.
 - We could add a 2 level cache layer (Memory cache + Redis - Decorator Pattern) for menu or customers/staff for better performance. For simplicity it was skipped.
-- It's not an application I would expect lots of exceptions. In case of many exceptions and many RPS Result pattern should be consired. Result pattern leads to long lines of code and I avoid it if not nessasary.
+- It's not an application I would expect lots of exceptions. In case of many exceptions and many RPS Result pattern should be considered. Result pattern leads to long lines of code and I avoid it if not nessasary.
 - Refit is a library that could be considered to be used but in the architecture of the project the interface is a port in Application. Application should not know url/header related info.
-- The exception model intentionally remains simple. In real-world systems, we might introduce structured error taxonomies, centralized registries, or Roslyn source generators to eliminate reflection and precompute metadata for higher performance.
+- The exceptions intentionally remains simple. In real-world systems, we might introduce structured error taxonomies, centralized registries, or Roslyn source generators to eliminate reflection and precompute metadata for higher performance.
 - JWT tokens should not be stateless and logout/refresh functionalities should be added. Login should not have only userid as "login".
 - Delivery time should be calculated by including the time for preparation somehow. For simplicity it was skipped.
-- More thorough and sophisticated Unit Tests.
+- More thorough and sophisticated Unit Tests are needed.
 - Add Integration Tests.
